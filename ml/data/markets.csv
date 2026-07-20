@@ -1,0 +1,21 @@
+name,district,state,latitude,longitude,base_transport_cost_per_km,market_id
+Koyambedu Market,Chennai,Tamil Nadu,13.0683,80.1908,2.2,m_1
+Ottanchatram Market,Dindigul,Tamil Nadu,10.5144,77.785,2.0,m_2
+Mettupalayam Market,Coimbatore,Tamil Nadu,11.3006,76.9405,2.5,m_3
+Panruti Market,Cuddalore,Tamil Nadu,11.7708,79.5539,2.1,m_4
+Thalaivasal Market,Salem,Tamil Nadu,11.5833,78.75,2.3,m_5
+Erode Turmeric Market,Erode,Tamil Nadu,11.341,77.7172,1.9,m_6
+Madurai Central Market,Madurai,Tamil Nadu,9.9252,78.1198,2.2,m_7
+Trichy Gandhi Market,Tiruchirappalli,Tamil Nadu,10.8158,78.6947,2.0,m_8
+Tirupur Mandi,Tirupur,Tamil Nadu,11.1085,77.3411,2.4,m_9
+Pollachi Market,Coimbatore,Tamil Nadu,10.6588,77.0097,2.3,m_10
+Salem Agricultural Market,Salem,Tamil Nadu,11.6643,78.146,2.1,m_11
+Dharmapuri Regulated Market,Dharmapuri,Tamil Nadu,12.1275,78.1578,2.0,m_12
+Vellore Mandi,Vellore,Tamil Nadu,12.9165,79.1325,2.2,m_13
+Theni Allinagaram Market,Theni,Tamil Nadu,10.0104,77.4777,1.8,m_14
+Thanjavur Market,Thanjavur,Tamil Nadu,10.787,79.1378,2.1,m_15
+Tirunelveli Market,Tirunelveli,Tamil Nadu,8.7139,77.7567,2.3,m_16
+Nagercoil Vadasery Market,Kanyakumari,Tamil Nadu,8.1884,77.4113,2.4,m_17
+Villupuram Mandi,Villupuram,Tamil Nadu,11.9401,79.4861,2.1,m_18
+Thoothukudi Market,Thoothukudi,Tamil Nadu,8.7642,78.1348,2.5,m_19
+Namakkal Poultry Market,Namakkal,Tamil Nadu,11.2189,78.1674,1.9,m_20
