@@ -36,6 +36,17 @@ export default function Settings() {
   const [district, setDistrict] = useState(user?.profile?.location_district || 'Delhi');
   const [market, setMarket] = useState(user?.profile?.location_market || 'Azadpur Mandi');
 
+  // Sync user profile state when user object loads/refreshes
+  useEffect(() => {
+    if (user) {
+      if (user.full_name) setFullName(user.full_name);
+      if (user.profile?.farm_size_hectares) setFarmSize(user.profile.farm_size_hectares);
+      if (user.profile?.primary_crops) setPrimaryCrops(user.profile.primary_crops);
+      if (user.profile?.location_district) setDistrict(user.profile.location_district);
+      if (user.profile?.location_market) setMarket(user.profile.location_market);
+    }
+  }, [user]);
+
   // Sync market selection when district changes
   useEffect(() => {
     const markets = DISTRICT_MARKETS[district] || [];

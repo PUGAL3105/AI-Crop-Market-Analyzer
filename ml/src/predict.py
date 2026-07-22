@@ -196,7 +196,6 @@ class Predictor:
         Generates localized feature importance percentages adding up to 100%.
         This ensures explainability is highly interactive and visually readable.
         """
-        # We calculate direct contributions based on crop sensitivity and weather deviations
         base_prices = {
             "Rice": 30.0, "Wheat": 25.0, "Cotton": 70.0,
             "Maize": 20.0, "Tomato": 15.0, "Potato": 12.0, "Onion": 18.0
@@ -207,31 +206,30 @@ class Predictor:
         temp_dev = abs(temp - 25.0)
         rain_dev = abs(rain - 30.0)
         
+        last_price = history_prices[-1] if (history_prices and len(history_prices) > 0) else base_p
+        
+        # Deterministic seed factor based on text hashing
+        hash_seed = (hash(crop + district + market) % 100) / 100.0
+        
         # Base weights
         contributions = {
-            "Historical Price Trend": float(8.5 + (history_prices[-1] - base_p) * 0.3),
+            "Historical Price Trend": float(8.5 + (last_price - base_p) * 0.3),
             "Crop Specific Baseline": float(base_p * 0.2),
-            "Market Competition": float(np.random.normal(2.5, 0.5)),
+            "Market Competition": float(2.5 + hash_seed * 0.5),
             "Seasonal Demand": float(5.0 * np.cos(2 * np.pi * (month - 6) / 12)),
             "Temperature Impact": float(-0.4 * temp_dev if temp > 32 else 0.2 * temp_dev),
             "Rainfall Supply-Side Impact": float(1.2 * (rain - 80) / 10 if rain > 80 else -0.3 * (30 - rain) if rain < 10 else 0.5),
             "Location Premium": float(1.5 if district in ["Chennai", "Coimbatore"] else -1.0)
         }
         
-        # Scale to match the difference from a standard base price
         total_contrib = sum(contributions.values())
         diff = pred_price - base_p
         
-        # Adjust contributions to sum up to difference or represent percent contribution
-        # In SHAP, we display the absolute contribution of each feature in terms of price change (+/- Rs)
-        # We'll normalize it so the base value + sum of SHAP values = predicted price
         shap_vals = {}
         for k, v in contributions.items():
-            # Apply scaling factor
             scale = (diff / (total_contrib + 1e-8)) if abs(total_contrib) > 0 else 0
-            shap_vals[k] = round(float(v * scale + np.random.normal(0, 0.1)), 2)
+            shap_vals[k] = round(float(v * scale), 2)
             
-        # Ensure at least some reasonable features have non-zero SHAP values
         if all(v == 0.0 for v in shap_vals.values()):
             shap_vals = {
                 "Historical Price Trend": round(float(diff * 0.6), 2),

@@ -1,3 +1,4 @@
+import os
 import json
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -10,7 +11,9 @@ from backend.app.schemas.schemas import PredictionRequest, PredictionResponse
 from ml.src.predict import Predictor
 
 router = APIRouter(prefix="/predictions", tags=["Predictions"])
-predictor = Predictor(model_dir="C:/Market Analyser/ml/models")
+
+MODEL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "ml", "models"))
+predictor = Predictor(model_dir=MODEL_DIR)
 
 @router.post("/predict", response_model=PredictionResponse)
 def predict_crop_price(

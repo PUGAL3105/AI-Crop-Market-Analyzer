@@ -1,7 +1,8 @@
+import os
 import math
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from backend.app.core.database import get_db
 from backend.app.api.auth import get_current_user
@@ -10,7 +11,10 @@ from backend.app.schemas.schemas import RecommendationRequest, RecommendationRes
 from ml.src.predict import Predictor
 
 router = APIRouter(prefix="/markets", tags=["Markets & Recommendations"])
-predictor = Predictor(model_dir="C:/Market Analyser/ml/models")
+
+# Dynamic model directory path
+MODEL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "ml", "models"))
+predictor = Predictor(model_dir=MODEL_DIR)
 
 # District Coordinates for Distance Calculations
 DISTRICT_COORDS = {
@@ -151,12 +155,13 @@ def get_selling_recommendation(
         net_profit = round(expected_profit - transport_cost - storage_cost, 2)
         
         # Recommended selling date logic
-        # If price trend is going up, recommend selling slightly later (e.g. 5 days after harvest)
-        # If trend is going down, sell immediately (harvest date)
-        harvest_dt = datetime.strptime(harvest_date_str, "%Y-%m-%d").date()
+        try:
+            harvest_dt = datetime.strptime(harvest_date_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            harvest_dt = date.today()
+
         if pred_res["price_trend"] == "up":
-            # Add 5 days
-            recommended_date = harvest_dt.replace(day=min(28, harvest_dt.day + 5))
+            recommended_date = harvest_dt + timedelta(days=5)
         else:
             recommended_date = harvest_dt
             

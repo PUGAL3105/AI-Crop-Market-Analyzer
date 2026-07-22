@@ -54,6 +54,7 @@ DISTRICT_COORDS = {
 }
 
 @router.get("", response_model=WeatherResponse)
+@router.get("/forecast", response_model=WeatherResponse)
 def get_weather_forecast(
     district: str = Query(..., description="Name of the agricultural district"),
     current_user: User = Depends(get_current_user),

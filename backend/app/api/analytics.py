@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, date, timedelta
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from backend.app.core.database import get_db
 from backend.app.api.auth import get_current_user
@@ -19,29 +19,30 @@ def get_unique_crops(current_user: User = Depends(get_current_user), db: Session
 @router.get("/historical", response_model=List[HistoricalPriceResponse])
 def get_historical_trends(
     crop: str = Query(..., description="Crop name"),
-    market_id: str = Query(..., description="UUID of the market"),
+    market_id: Optional[str] = Query(None, description="UUID of the market (optional)"),
     range_days: int = Query(30, description="Range of days to look back"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Retrieve historical prices for a crop at a market over a given time range."""
-    # Look up market
-    market = db.query(Market).filter(Market.id == market_id).first()
-    if not market:
-        raise HTTPException(status_code=404, detail="Market not found")
-        
+    """Retrieve historical prices for a crop over a given time range."""
     start_date = date.today() - timedelta(days=range_days)
     
-    prices = db.query(HistoricalPrice).filter(
+    query = db.query(HistoricalPrice).filter(
         HistoricalPrice.crop_name == crop,
-        HistoricalPrice.market_id == market_id,
         HistoricalPrice.record_date >= start_date
-    ).order_by(HistoricalPrice.record_date.asc()).all()
+    )
+    
+    if market_id:
+        market = db.query(Market).filter(Market.id == market_id).first()
+        if market:
+            query = query.filter(HistoricalPrice.market_id == market_id)
+            
+    prices = query.order_by(HistoricalPrice.record_date.asc()).all()
     
     return [
         HistoricalPriceResponse(
-            date=p.record_date.strftime("%Y-%m-%d"),
-            price_per_kg=p.price_per_kg
+            date=p.record_date.strftime("%Y-%m-%d") if p.record_date else start_date.strftime("%Y-%m-%d"),
+            price_per_kg=p.price_per_kg or 0.0
         ) for p in prices
     ]
 
@@ -54,7 +55,7 @@ def compare_market_prices(
     db: Session = Depends(get_db)
 ):
     """Compare prices of a crop across multiple markets."""
-    market_id_list = market_ids.split(",")
+    market_id_list = [m.strip() for m in market_ids.split(",") if m.strip()]
     start_date = date.today() - timedelta(days=range_days)
     
     comparison_data = {}
@@ -71,8 +72,9 @@ def compare_market_prices(
         ).order_by(HistoricalPrice.record_date.asc()).all()
         
         comparison_data[market.name] = [
-            {"date": p.record_date.strftime("%Y-%m-%d"), "price": p.price_per_kg}
+            {"date": p.record_date.strftime("%Y-%m-%d") if p.record_date else "", "price": p.price_per_kg}
             for p in prices
         ]
         
     return comparison_data
+

@@ -161,7 +161,7 @@ export default function MarketRecommendation() {
                     </p>
                   </div>
                   <div className="text-left sm:text-right">
-                    <span className="text-3xl font-black text-emerald-400">Rs {recommendations[0].net_profit.toLocaleString()}</span>
+                    <span className="text-3xl font-black text-emerald-400">Rs {(recommendations[0].net_profit || 0).toLocaleString()}</span>
                     <p className="text-[10px] text-slate-400">Expected Net Income</p>
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export default function MarketRecommendation() {
 
                       <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-0 border-slate-800 pt-3 sm:pt-0">
                         <div className="text-left sm:text-right">
-                          <span className="font-black text-slate-200">Rs {rec.net_profit.toLocaleString()}</span>
+                          <span className="font-black text-slate-200">Rs {(rec.net_profit || 0).toLocaleString()}</span>
                           <p className="text-[10px] text-slate-400">Net Profit</p>
                         </div>
                         <div className="bg-slate-950 p-2 rounded-xl text-slate-400 hover:text-emerald-400 transition cursor-pointer">
