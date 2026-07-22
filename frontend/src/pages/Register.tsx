@@ -38,19 +38,21 @@ export default function Register() {
         navigate('/login');
       }, 2000);
     } catch (err: any) {
-      console.error(err);
-      if (err.response && err.response.data && err.response.data.detail) {
+      console.error("Registration error:", err);
+      if (err.response?.data?.detail) {
         const detail = err.response.data.detail;
         if (typeof detail === 'string') {
           setError(detail);
         } else if (Array.isArray(detail)) {
-          const messages = detail.map((e: any) => `${e.loc[e.loc.length - 1]}: ${e.msg}`).join(', ');
+          const messages = detail.map((e: any) => `${e.loc ? e.loc[e.loc.length - 1] : 'field'}: ${e.msg}`).join(', ');
           setError(messages);
         } else {
           setError(JSON.stringify(detail));
         }
+      } else if (err.message) {
+        setError(`Registration error: ${err.message}`);
       } else {
-        setError('Registration failed. Please try again.');
+        setError('Registration failed. Please check network connection or server status.');
       }
     } finally {
       setLoading(false);

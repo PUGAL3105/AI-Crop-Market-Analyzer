@@ -12,15 +12,33 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
     
     # Database
-    # Default to local SQLite database in workspace if no PostgreSQL URL is provided
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL", 
-        "sqlite:///C:/Market Analyser/agripredict.db"
-    )
+    @property
+    def REAL_DATABASE_URL(self) -> str:
+        env_db = os.getenv("DATABASE_URL")
+        if env_db:
+            # Fix legacy Heroku/Vercel postgres:// schema for SQLAlchemy
+            if env_db.startswith("postgres://"):
+                return env_db.replace("postgres://", "postgresql://", 1)
+            return env_db
+        
+        # Default SQLite path: /tmp for serverless environment, local file otherwise
+        if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME") or not os.access(".", os.W_OK):
+            return "sqlite:////tmp/agripredict.db"
+        
+        root_db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "agripredict.db"))
+        return f"sqlite:///{root_db_path}"
+    
+    DATABASE_URL: str = ""
     
     # ML Paths
-    MODEL_DIR: str = os.getenv("MODEL_DIR", "C:/Market Analyser/ml/models")
-    DATA_DIR: str = os.getenv("DATA_DIR", "C:/Market Analyser/ml/data")
+    MODEL_DIR: str = os.getenv(
+        "MODEL_DIR", 
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "ml", "models"))
+    )
+    DATA_DIR: str = os.getenv(
+        "DATA_DIR", 
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "ml", "data"))
+    )
     
     # Weather Configuration
     WEATHER_API_URL: str = "https://api.open-meteo.com/v1/forecast"
@@ -29,3 +47,7 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 settings = Settings()
+
+# Dynamically set DATABASE_URL property
+if not settings.DATABASE_URL:
+    settings.DATABASE_URL = settings.REAL_DATABASE_URL
