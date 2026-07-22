@@ -193,6 +193,8 @@ def startup_event():
         print(f"Warning: Startup DB initialization encountered non-fatal notice: {e}")
 
 @app.get("/")
+@app.get("/api")
+@app.get("/api/health")
 def read_root():
     return {
         "status": "online",
