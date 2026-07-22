@@ -1,0 +1,28 @@
+# ─── Vercel Deployment Exclusion List ──────────────────────────────────────────
+# Exclude local virtual environments, database files, and dev node_modules
+# to prevent exceeding Vercel's 500MB serverless function bundle limit.
+
+# Database files (55MB+)
+*.db
+*.sqlite
+*.sqlite3
+agripredict.db
+
+# Virtual Environments (Local python dependencies)
+venv/
+.venv/
+backend/venv/
+env/
+
+# Node Modules & Build Caches
+node_modules/
+frontend/node_modules/
+.pytest_cache/
+.git/
+.idea/
+.vscode/
+
+# Large Datasets and Models
+ml/data/historical_prices.csv
+*.h5
+*.pkl
