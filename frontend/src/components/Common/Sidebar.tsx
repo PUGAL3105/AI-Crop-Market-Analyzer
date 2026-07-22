@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
   LayoutDashboard, 
@@ -11,7 +11,8 @@ import {
   Leaf,
   Bell,
   User,
-  ShieldCheck
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,9 +21,15 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   
   if (!user) return null;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   // Split navigation items into categories matching the image layout
   const navigationItems = [
@@ -185,15 +192,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         </div>
 
-        {/* User profile footer block matching the image */}
-        <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex items-center gap-3">
-          <div className="w-9 h-9 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-xs font-black text-slate-600 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700">
-            {initials}
+        {/* User profile footer block */}
+        <div className="border-t border-slate-100 dark:border-slate-800 pt-4 space-y-3">
+          
+          {/* User info */}
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-xs font-black text-slate-600 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700 shrink-0">
+              {initials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h4 className="text-xs font-black text-slate-800 dark:text-white truncate leading-tight">{user.full_name || 'Agri User'}</h4>
+              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 block truncate capitalize">{user.role} · Premium Analyst</span>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <h4 className="text-xs font-black text-slate-800 dark:text-white truncate leading-tight">{user.full_name || 'Agri User'}</h4>
-            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 block truncate">Premium Analyst</span>
-          </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-900/50 hover:bg-rose-100 dark:hover:bg-rose-950/70 hover:border-rose-300 dark:hover:border-rose-800 transition-all duration-200 cursor-pointer group"
+          >
+            <LogOut className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            <span>Sign out of account</span>
+          </button>
+
         </div>
 
       </aside>

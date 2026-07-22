@@ -57,7 +57,7 @@ class HistoricalPrice(Base):
     
     id = Column(String(36), primary_key=True, default=generate_uuid)
     crop_name = Column(String(100), nullable=False, index=True)
-    market_id = Column(String(36), ForeignKey("markets.id", ondelete="CASCADE"), nullable=False)
+    market_id = Column(String(36), ForeignKey("markets.id", ondelete="CASCADE"), nullable=False, index=True)
     price_per_kg = Column(Float, nullable=False)
     record_date = Column(Date, nullable=False, index=True)
     

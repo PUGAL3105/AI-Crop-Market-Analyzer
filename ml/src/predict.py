@@ -30,8 +30,12 @@ class Predictor:
         # 3. Load best model object
         model_path = os.path.join(self.model_dir, "best_model.pkl")
         if os.path.exists(model_path):
-            with open(model_path, "rb") as f:
-                self.best_model = pickle.load(f)
+            try:
+                with open(model_path, "rb") as f:
+                    self.best_model = pickle.load(f)
+            except Exception as e:
+                print(f"Warning: Could not load ML model due to: {e}. Falling back to mock predictor.")
+                self.best_model = None
 
     def predict_price_and_explain(self, crop, district, market, quantity, harvest_date, weather_info, history_prices):
         """
